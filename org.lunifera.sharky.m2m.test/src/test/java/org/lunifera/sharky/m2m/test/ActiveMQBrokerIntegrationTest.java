@@ -4,14 +4,11 @@ import static org.junit.Assert.assertEquals;
 
 import java.net.URISyntaxException;
 
-import org.fusesource.hawtbuf.Buffer;
-import org.fusesource.hawtbuf.UTF8Buffer;
-import org.fusesource.mqtt.client.Callback;
-import org.fusesource.mqtt.client.CallbackConnection;
-import org.fusesource.mqtt.client.Listener;
-import org.fusesource.mqtt.client.MQTT;
-import org.fusesource.mqtt.client.QoS;
-import org.fusesource.mqtt.client.Topic;
+import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
+import org.eclipse.paho.client.mqttv3.MqttCallback;
+import org.eclipse.paho.client.mqttv3.MqttClient;
+import org.eclipse.paho.client.mqttv3.MqttException;
+import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.ContextConfiguration;
@@ -28,10 +25,10 @@ public class ActiveMQBrokerIntegrationTest {
 	private Throwable error;
 
 	@Test
-	public void shouldReceiveMQTTAfterSendingOne() throws Throwable {
+	public void shouldReceiveMqttClientAfterSendingOne() throws Throwable {
 		// see https://github.com/fusesource/mqtt-client/tree/mqtt-client-project-1.3
-		MQTT publishClient = createClient();
-		MQTT receiveClient = createClient();
+		MqttClient publishClient = createClient();
+		MqttClient receiveClient = createClient();
 
 		subscribe(receiveClient);
 		Thread.sleep(100);
@@ -49,51 +46,27 @@ public class ActiveMQBrokerIntegrationTest {
 		}
 	}
 
-	private MQTT createClient() throws URISyntaxException {
-		MQTT mqtt = new MQTT();
-		mqtt.setHost("127.0.0.1", 1883);
+	private MqttClient createClient() throws URISyntaxException, MqttException {
+		MqttClient mqtt = new MqttClient("tcp://127.0.0.1:1883", MqttClient.generateClientId());
+		mqtt.connect();
 		return mqtt;
 	}
 
-	private void subscribe(MQTT client) throws Exception {
-		final CallbackConnection readConnection = client.callbackConnection();
-		readConnection.listener(new Listener() {
-			public void onConnected() {
+	private void subscribe(MqttClient client) throws Exception {
+		client.subscribe(TOPIC);
+		client.setCallback(new MqttCallback() {
+			@Override
+			public void messageArrived(String topic, MqttMessage message) throws Exception {
+				setResponse(new String(message.getPayload()));
 			}
 
-			public void onPublish(UTF8Buffer topic, Buffer payload, Runnable ack) {
-				setResponse(new String(payload.data, payload.offset, payload.length));
-				ack.run();
+			@Override
+			public void deliveryComplete(IMqttDeliveryToken token) {
 			}
 
-			public void onDisconnected() {
-			}
-
-			public void onFailure(Throwable value) {
-				setError(value);
-			}
-		});
-
-		readConnection.connect(new Callback<Void>() {
-
-			// Once we connect..
-			public void onSuccess(Void v) {
-
-				// Subscribe to a topic
-				Topic[] topics = { new Topic(TOPIC, QoS.AT_LEAST_ONCE) };
-				readConnection.subscribe(topics, new Callback<byte[]>() {
-					public void onSuccess(byte[] qoses) {
-					}
-
-					public void onFailure(Throwable value) {
-						setError(value);
-						readConnection.disconnect(null); // subscribe failed.
-					}
-				});
-			}
-
-			public void onFailure(Throwable value) {
-				setError(value);
+			@Override
+			public void connectionLost(Throwable ex) {
+				setError(ex);
 			}
 		});
 	}
@@ -106,29 +79,7 @@ public class ActiveMQBrokerIntegrationTest {
 		error = value;
 	}
 
-	private void send(MQTT client) throws Exception {
-		final CallbackConnection publishConnection = client.callbackConnection();
-		publishConnection.connect(new Callback<Void>() {
-			@Override
-			public void onSuccess(Void value) {
-			}
-
-			@Override
-			public void onFailure(Throwable value) {
-				setError(value);
-			}
-		});
-
-		publishConnection.publish(TOPIC, PAYLOAD.getBytes(), QoS.AT_LEAST_ONCE, false, new Callback<Void>() {
-			public void onSuccess(Void v) {
-				// the pubish operation completed successfully.
-			}
-
-			public void onFailure(Throwable value) {
-				setError(value);
-				publishConnection.disconnect(null); // publish failed.
-			}
-		});
+	private void send(MqttClient client) throws Exception {
+		client.publish(TOPIC, PAYLOAD.getBytes(), 0, false);
 	}
-
 }
