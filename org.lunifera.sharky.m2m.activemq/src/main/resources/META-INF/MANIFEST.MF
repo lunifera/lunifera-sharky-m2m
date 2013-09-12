@@ -4,6 +4,6 @@ Tool: Bundlor 1.1.2.RELEASE
 Bundle-Name: ActiveMQ
 Bundle-ManifestVersion: 2
 Import-Package: org.apache.activemq.xbean,org.slf4j;version="[1.7.2,1.
- 7.2]"
+ 7.2]",org.springframework.beans.factory.config
 Bundle-SymbolicName: org.lunifera.sharky.m2m.activemq
 
