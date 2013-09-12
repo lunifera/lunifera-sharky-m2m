@@ -1,0 +1,9 @@
+Manifest-Version: 1.0
+Bundle-Version: 1.0.0.qualifier
+Tool: Bundlor 1.1.2.RELEASE
+Bundle-Name: Integration Tests
+Bundle-ManifestVersion: 2
+Import-Package: org.lunifera.virgo.example.maven.spring,org.slf4j;vers
+ ion="[1.7.2,1.7.2]"
+Bundle-SymbolicName: org.lunifera.sharky.m2m.test
+
