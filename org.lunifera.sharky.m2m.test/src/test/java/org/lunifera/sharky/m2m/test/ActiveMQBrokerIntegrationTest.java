@@ -4,9 +4,12 @@ import static org.junit.Assert.assertEquals;
 
 import java.net.URISyntaxException;
 
-import org.fusesource.mqtt.client.BlockingConnection;
+import org.fusesource.hawtbuf.Buffer;
+import org.fusesource.hawtbuf.UTF8Buffer;
+import org.fusesource.mqtt.client.Callback;
+import org.fusesource.mqtt.client.CallbackConnection;
+import org.fusesource.mqtt.client.Listener;
 import org.fusesource.mqtt.client.MQTT;
-import org.fusesource.mqtt.client.Message;
 import org.fusesource.mqtt.client.QoS;
 import org.fusesource.mqtt.client.Topic;
 import org.junit.Test;
@@ -22,30 +25,24 @@ public class ActiveMQBrokerIntegrationTest {
 	private static final String PAYLOAD = "Hello";
 
 	private String answer;
-	private Exception error;
+	private Throwable error;
 
 	@Test
-	public void shouldReceiveMQTTAfterSendingOne() throws Exception {
+	public void shouldReceiveMQTTAfterSendingOne() throws Throwable {
 		// see https://github.com/fusesource/mqtt-client/tree/mqtt-client-project-1.3
-		final MQTT client = createClient();
+		MQTT publishClient = createClient();
+		MQTT receiveClient = createClient();
 
-		Thread senderThread = new Thread(new Runnable() {
-			@Override
-			public void run() {
-				try {
-					receive(client);
-				} catch (Exception ex) {
-					error = ex;
-				}
-			}
-		});
-		senderThread.start();
+		subscribe(receiveClient);
+		Thread.sleep(100);
 
-		Thread.sleep(1000);
+		send(publishClient);
+		Thread.sleep(500);
 
-		send(client);
-		senderThread.join();
+		assertResult();
+	}
 
+	private synchronized void assertResult() throws Throwable {
 		assertEquals(PAYLOAD, answer);
 		if (error != null) {
 			throw error;
@@ -54,41 +51,84 @@ public class ActiveMQBrokerIntegrationTest {
 
 	private MQTT createClient() throws URISyntaxException {
 		MQTT mqtt = new MQTT();
-		mqtt.setHost("localhost", 1883);
+		mqtt.setHost("127.0.0.1", 1883);
 		return mqtt;
 	}
 
-	private void receive(MQTT client) throws Exception {
-		BlockingConnection readConnection = subscribe(client, TOPIC);
-		try {
-			Message message = readConnection.receive();
-			byte[] payload = message.getPayload();
-			answer = new String(payload);
-			message.ack();
-		} finally {
-			readConnection.disconnect();
-		}
+	private void subscribe(MQTT client) throws Exception {
+		final CallbackConnection readConnection = client.callbackConnection();
+		readConnection.listener(new Listener() {
+			public void onConnected() {
+			}
+
+			public void onPublish(UTF8Buffer topic, Buffer payload, Runnable ack) {
+				setResponse(new String(payload.data, payload.offset, payload.length));
+				ack.run();
+			}
+
+			public void onDisconnected() {
+			}
+
+			public void onFailure(Throwable value) {
+				setError(value);
+			}
+		});
+
+		readConnection.connect(new Callback<Void>() {
+
+			// Once we connect..
+			public void onSuccess(Void v) {
+
+				// Subscribe to a topic
+				Topic[] topics = { new Topic(TOPIC, QoS.AT_LEAST_ONCE) };
+				readConnection.subscribe(topics, new Callback<byte[]>() {
+					public void onSuccess(byte[] qoses) {
+					}
+
+					public void onFailure(Throwable value) {
+						setError(value);
+						readConnection.disconnect(null); // subscribe failed.
+					}
+				});
+			}
+
+			public void onFailure(Throwable value) {
+				setError(value);
+			}
+		});
 	}
 
-	private BlockingConnection subscribe(MQTT client, String topicName) throws Exception {
-		BlockingConnection readConnection = client.blockingConnection();
-		Topic[] topics = { new Topic(topicName, QoS.AT_LEAST_ONCE) };
-		readConnection.subscribe(topics);
-		return readConnection;
+	private synchronized void setResponse(String value) {
+		answer = value;
+	}
+
+	private synchronized void setError(Throwable value) {
+		error = value;
 	}
 
 	private void send(MQTT client) throws Exception {
-		BlockingConnection publishConnection = client.blockingConnection();
-		publishConnection.connect();
-		try {
-			publish(publishConnection, TOPIC);
-		} finally {
-			publishConnection.disconnect();
-		}
-	}
+		final CallbackConnection publishConnection = client.callbackConnection();
+		publishConnection.connect(new Callback<Void>() {
+			@Override
+			public void onSuccess(Void value) {
+			}
 
-	private void publish(BlockingConnection publishConnection, String topicName) throws Exception {
-		publishConnection.publish(topicName, PAYLOAD.getBytes(), QoS.AT_LEAST_ONCE, false);
+			@Override
+			public void onFailure(Throwable value) {
+				setError(value);
+			}
+		});
+
+		publishConnection.publish(TOPIC, PAYLOAD.getBytes(), QoS.AT_LEAST_ONCE, false, new Callback<Void>() {
+			public void onSuccess(Void v) {
+				// the pubish operation completed successfully.
+			}
+
+			public void onFailure(Throwable value) {
+				setError(value);
+				publishConnection.disconnect(null); // publish failed.
+			}
+		});
 	}
 
 }
