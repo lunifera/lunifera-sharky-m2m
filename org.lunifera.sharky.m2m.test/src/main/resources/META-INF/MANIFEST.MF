@@ -7,8 +7,7 @@ Tool: Bundlor 1.1.2.RELEASE
 Bundle-Name: Integration Tests
 Bundle-ManifestVersion: 2
 Import-Package: org.eclipse.paho.client.mqttv3,org.junit,org.junit.run
- ner,org.lunifera.virgo.example.maven.spring,org.slf4j;version="[1.7.2
- ,1.7.2]",org.springframework.test.context,org.springframework.test.co
- ntext.junit4
+ ner,org.slf4j;version="[1.7.2,1.7.2]",org.springframework.test.contex
+ t,org.springframework.test.context.junit4
 Bundle-SymbolicName: org.lunifera.sharky.m2m.test
 

@@ -1,9 +1,16 @@
 Manifest-Version: 1.0
+Import-Bundle: org.apache.activemq.activemq-core;version="[5.7.0,5.8.0
+ )",org.springframework.context;version="[3.1.0.RELEASE,4.0.0)",org.sp
+ ringframework.beans;version="[3.1.0.RELEASE,4.0.0)",org.springframewo
+ rk.aop;version="[3.1.0.RELEASE,4.0.0)",org.springframework.expression
+ ;version="[3.1.0.RELEASE,4.0.0)",org.springframework.core;version="[3
+ .1.0.RELEASE,4.0.0)",org.springframework.asm;version="[3.1.0.RELEASE,
+ 4.0.0)"
+Import-Bundle-Comment: context depends on beans, aop and so on
 Bundle-Version: 1.0.0.qualifier
 Tool: Bundlor 1.1.2.RELEASE
 Bundle-Name: ActiveMQ
 Bundle-ManifestVersion: 2
-Import-Package: org.apache.activemq.xbean,org.slf4j;version="[1.7.2,1.
- 7.2]",org.springframework.beans.factory.config
+Import-Package: org.apache.activemq.xbean
 Bundle-SymbolicName: org.lunifera.sharky.m2m.activemq
 

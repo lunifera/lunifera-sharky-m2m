@@ -30,12 +30,12 @@
 				<configuration>
 					<outputDirectory>${project.build.directory}/par-provided</outputDirectory>
 					<overWriteIfNewer>true</overWriteIfNewer>
-					<excludeGroupIds>org.osgi,org.eclipse.virgo,org.slf4j,org.springframework</excludeGroupIds>
+					<excludeGroupIds>org.osgi,org.eclipse.virgo,org.slf4j</excludeGroupIds>
 				</configuration>
 				<executions>
 					<execution>
 						<id>copy-dependencies</id>
-						<phase>package</phase>
+						<phase>prepare-package</phase>
 						<goals>
 							<goal>copy-dependencies</goal>
 						</goals>
@@ -45,8 +45,7 @@
 		</plugins>
 		<pluginManagement>
 			<plugins>
-				<!--This plugin's configuration is used to store Eclipse m2e settings 
-					only. It has no influence on the Maven build itself. -->
+				<!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself. -->
 				<plugin>
 					<groupId>org.eclipse.m2e</groupId>
 					<artifactId>lifecycle-mapping</artifactId>
@@ -87,7 +86,25 @@
 		<dependency>
 			<groupId>org.lunifera.sharky.m2m</groupId>
 			<artifactId>activemq</artifactId>
-			<version>1.0.0-SNAPSHOT</version>
+			<version>${project.version}</version>
+		</dependency>
+		<!-- par does not pick up our transitive dependencies :-( -->
+		<dependency>
+			<groupId>org.apache.activemq</groupId>
+			<artifactId>activemq-core</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.activemq</groupId>
+			<artifactId>kahadb</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.xbean</groupId>
+			<artifactId>xbean-spring</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.geronimo.specs</groupId>
+			<artifactId>geronimo-j2ee-management_1.1_spec</artifactId>
+			<version>1.0.1</version>
 		</dependency>
 	</dependencies>
 </project>
