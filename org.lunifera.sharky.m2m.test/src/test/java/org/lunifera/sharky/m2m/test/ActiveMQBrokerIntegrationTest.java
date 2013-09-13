@@ -26,7 +26,6 @@ public class ActiveMQBrokerIntegrationTest {
 
 	@Test
 	public void shouldReceiveMqttClientAfterSendingOne() throws Throwable {
-		// see https://github.com/fusesource/mqtt-client/tree/mqtt-client-project-1.3
 		MqttClient publishClient = createClient();
 		MqttClient receiveClient = createClient();
 
