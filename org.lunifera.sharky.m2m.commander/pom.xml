@@ -1,6 +1,5 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
 		<groupId>org.lunifera.sharky.m2m</groupId>
@@ -9,21 +8,11 @@
 		<relativePath>..</relativePath>
 	</parent>
 
-	<artifactId>test</artifactId>
-	<packaging>jar</packaging>
+	<modelVersion>4.0.0</modelVersion>
+	<artifactId>commander</artifactId>
+	<name>Sharky Commander Module</name>
 
 	<dependencies>
-		<dependency>
-			<groupId>org.lunifera.sharky.m2m</groupId>
-			<artifactId>activemq</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-api</artifactId>
-		</dependency>
-
-		<!-- only for the test -->
 		<dependency>
 			<groupId>org.eclipse.paho</groupId>
 			<artifactId>mqtt-client</artifactId>
@@ -33,21 +22,23 @@
 			<artifactId>mqtt-utility</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-simple</artifactId>
-			<version>${slf4j.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>spring-test</artifactId>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
 			<version>4.10</version>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
+
+	<build>
+		<resources>
+			<resource>
+				<directory>tmpLib</directory>
+			</resource>
+			<resource>
+				<targetPath>OSGI-INF</targetPath>
+				<directory>OSGI-INF</directory>
+			</resource>
+		</resources>
+	</build>
 
 </project>

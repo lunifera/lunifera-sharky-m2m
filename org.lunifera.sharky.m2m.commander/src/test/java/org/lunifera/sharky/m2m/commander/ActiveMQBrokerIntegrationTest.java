@@ -1,4 +1,4 @@
-package org.lunifera.sharky.m2m.test;
+package org.lunifera.sharky.m2m.commander;
 
 import static org.junit.Assert.assertEquals;
 
@@ -10,12 +10,7 @@ import org.eclipse.paho.client.mqttv3.MqttClient;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-@ContextConfiguration
-@RunWith(SpringJUnit4ClassRunner.class)
 public class ActiveMQBrokerIntegrationTest {
 
 	private static final String TOPIC = "foo";
