@@ -16,11 +16,18 @@
 		<!-- ActiveMQ -->
 		<activemq.version>5.7.0</activemq.version>
 		<xbean.version>3.14</xbean.version>
+		<!-- MQTT Client -->
+		<paho.version>0.4.1-SNAPSHOT</paho.version>
+		<vaadin.version>7.1.5</vaadin.version>
+		<osgi.version>4.3.1</osgi.version>
 	</properties>
 
 	<modules>
 		<module>org.lunifera.sharky.m2m.activemq</module>
-		<module>org.lunifera.sharky.m2m.par</module>
+		<module>org.lunifera.sharky.m2m.commander</module>
+		<module>org.lunifera.sharky.m2m.webclient</module>
+		<module>org.lunifera.sharky.m2m.server.par</module>
+		<module>org.lunifera.sharky.m2m.client.par</module>
 		<module>org.lunifera.sharky.m2m.test</module>
 	</modules>
 
@@ -51,6 +58,11 @@
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-resource-plugin</artifactId>
+				<version>2.4</version>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-jar-plugin</artifactId>
 				<version>2.4</version>
 				<configuration>
@@ -64,6 +76,13 @@
 		</plugins>
 	</build>
 
+	<repositories>
+		<repository>
+			<id>eclipse.paho.build</id>
+			<name>Eclipse Paho Snapshots</name>
+			<url>https://repo.eclipse.org/content/repositories/paho-snapshots</url>
+		</repository>
+	</repositories>
 	<pluginRepositories>
 		<pluginRepository>
 			<id>eclipse.virgo.build.bundles.release</id>
@@ -84,6 +103,17 @@
 
 	<dependencyManagement>
 		<dependencies>
+			<dependency>
+				<groupId>org.osgi</groupId>
+				<artifactId>org.osgi.core</artifactId>
+				<version>${osgi.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.osgi</groupId>
+				<artifactId>org.osgi.compendium</artifactId>
+				<version>${osgi.version}</version>
+			</dependency>
+
 			<dependency>
 				<groupId>org.apache.activemq</groupId>
 				<artifactId>activemq-core</artifactId>
@@ -160,6 +190,17 @@
 				<groupId>org.slf4j</groupId>
 				<artifactId>slf4j-api</artifactId>
 				<version>${slf4j.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>org.eclipse.paho</groupId>
+				<artifactId>mqtt-client</artifactId>
+				<version>${paho.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.eclipse.paho</groupId>
+				<artifactId>mqtt-utility</artifactId>
+				<version>${paho.version}</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>

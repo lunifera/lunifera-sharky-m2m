@@ -1,0 +1,14 @@
+<plan name="org.lunifera.apache.activemq-core" version="3.6.2" scoped="false" atomic="true"
+			xmlns="http://www.eclipse.org/virgo/schema/plan"
+			xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+			xsi:schemaLocation="http://www.eclipse.org/virgo/schema/plan http://www.eclipse.org/virgo/schema/plan/eclipse-virgo-plan.xsd">
+
+		<artifact type="bundle" name="org.apache.activemq.activemq-core" version="[5.7.0, 5.8.0)"/>
+		<artifact type="bundle" name="org.apache.geronimo.specs.geronimo-j2ee-management_1.1_spec" version="[1.0.1, 1.0.2)"/>
+		<artifact type="bundle" name="org.apache.geronimo.specs.geronimo-jms_1.1_spec" version="[1.1.1, 1.2.0)"/>
+		<artifact type="bundle" name="org.fusesource.hawtbuf.hawtbuf" version="[1.9.0, 2)"/>
+		<artifact type="bundle" name="org.fusesource.hawtdispatch.hawtdispatch" version="[1.11.0, 1.12.0)"/>
+		<artifact type="bundle" name="org.fusesource.hawtdispatch.hawtdispatch-transport" version="[1.11.0, 1.11.0)"/>
+		<artifact type="bundle" name="org.apache.activemq.kahadb" version="[5.7.0, 5.8.0)"/>
+		<artifact type="bundle" name="org.apache.xbean.spring" version="[3.14.0, 3.15.0)"/>
+</plan>
