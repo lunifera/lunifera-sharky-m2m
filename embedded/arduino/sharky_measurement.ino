@@ -1,5 +1,3 @@
-const int cmdPin = 13; // pin for requesting measurement
-
 const int pingPin1 = 47; // pins connected to the sensors
 const int pingPin2 = 45;
 const int pingPin3 = 43;
@@ -8,28 +6,35 @@ const int pingPin4 = 41;
 
 long duration, cm1, cm2, cm3, cm4;
 
+int incomingByte = 0;
+
 
 
 void setup() {
   // initialise serial communication
   Serial.begin(9600);
-  
-  // set up interrupt on request pin 
-  attachInterrupt(cmdPin, ping, RISING); // call ping function on request
 }
 
 
 
 void loop()
 {
-  // do nothing
+  // check for measurement request on UART
+  if (Serial.available() > 0) {
+    // read the incoming byte:
+    incomingByte = Serial.read();
+
+    if(incomingByte == 'p') {
+      ping();
+    }
+  }
 }
 
 
 
 long microsecondsToCentimeters(long microseconds)
 {
-  // speed of sound is 29 microseconds per centimetre
+  // speed of sound is 29 microseconds per centimeter
   return microseconds / 29 / 2;
 }
 
@@ -91,11 +96,11 @@ void ping()
  
   // output result on serial 
   Serial.print(cm1);
-  Serial.print(",");
+  Serial.print(":");
   Serial.print(cm2);
-  Serial.print(",");
+  Serial.print(":");
   Serial.print(cm3);  
-  Serial.print(",");
+  Serial.print(":");
   Serial.print(cm4);
   Serial.println();  
 }
