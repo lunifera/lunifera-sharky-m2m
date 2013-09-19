@@ -19,6 +19,8 @@ void setup() {
 
 void loop()
 {
+  delayMicroseconds(50);
+  
   // check for measurement request on UART
   if (Serial.available() > 0) {
     // read the incoming byte:
@@ -80,7 +82,8 @@ void ping()
   pinMode(pingPin3, INPUT);
   duration = pulseIn(pingPin3, HIGH);
   cm3 = microsecondsToCentimeters(duration);
-  
+ 
+ /* 
   // probe sensor 4
   pinMode(pingPin4, OUTPUT);
   digitalWrite(pingPin4, LOW);
@@ -93,6 +96,7 @@ void ping()
   pinMode(pingPin4, INPUT);
   duration = pulseIn(pingPin4, HIGH);
   cm4 = microsecondsToCentimeters(duration);
+ */
  
   // output result on serial 
   Serial.print(cm1);
@@ -100,8 +104,8 @@ void ping()
   Serial.print(cm2);
   Serial.print(":");
   Serial.print(cm3);  
-  Serial.print(":");
-  Serial.print(cm4);
+  //Serial.print(":");
+  //Serial.print(cm4);
   Serial.println();  
 }
 
