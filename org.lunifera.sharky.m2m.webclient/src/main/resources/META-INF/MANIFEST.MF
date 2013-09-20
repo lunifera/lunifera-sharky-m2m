@@ -1,15 +1,21 @@
 Manifest-Version: 1.0
-Import-Bundle: org.apache.activemq.activemq-core;version="[5.7.0,5.8.0
- )",org.springframework.context;version="[3.1.0.RELEASE,4.0.0)",org.sp
- ringframework.beans;version="[3.1.0.RELEASE,4.0.0)",org.springframewo
- rk.aop;version="[3.1.0.RELEASE,4.0.0)",org.springframework.expression
- ;version="[3.1.0.RELEASE,4.0.0)",org.springframework.core;version="[3
- .1.0.RELEASE,4.0.0)",org.springframework.asm;version="[3.1.0.RELEASE,
- 4.0.0)"
+Export-Package: org.lunifera.sharky.m2m.webclient;version="1.0.0.quali
+ fier";uses:="com.vaadin.annotations,com.vaadin.server,com.vaadin.ui,j
+ avax.servlet.http,org.osgi.framework,org.osgi.service.http,org.osgi.u
+ til.tracker"
 Import-Bundle-Comment: context depends on beans, aop and so on
 Bundle-Version: 1.0.0.qualifier
 Tool: Bundlor 1.1.2.RELEASE
-Bundle-Name: ActiveMQ
+Bundle-Name: Vaadin web client
 Bundle-ManifestVersion: 2
-Bundle-SymbolicName: org.lunifera.sharky.m2m.activemq
+Bundle-Activator: org.lunifera.sharky.m2m.webclient.Activator
+Import-Package: com.vaadin.annotations;version="[7.1.5,7.1.5]",com.vaa
+ din.server;version="[7.1.5,7.1.5]",com.vaadin.shared.ui.label;version
+ ="[7.1.5,7.1.5]",com.vaadin.ui,com.vaadin.ui.themes;version="[7.1.5,7
+ .1.5]",javax.servlet;version="[2.6.0,2.6.0]",javax.servlet.http,org.o
+ sgi.framework,org.osgi.service.component;version="[1.2.0,1.2.0]",org.
+ osgi.service.component.annotations;version="[1.2.0,1.2.0]",org.osgi.s
+ ervice.http;version="[1.2.1,1.2.1]",org.osgi.util.tracker;version="[1
+ .5.1,1.5.1]"
+Bundle-SymbolicName: org.lunifera.sharky.m2m.webclient
 

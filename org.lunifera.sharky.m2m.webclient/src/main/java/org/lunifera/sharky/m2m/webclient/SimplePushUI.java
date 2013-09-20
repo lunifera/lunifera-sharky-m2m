@@ -1,4 +1,4 @@
- /**
+/**
  * Copyright 2013 Lunifera GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -58,15 +58,11 @@ public class SimplePushUI extends UI {
 					label.getUI().access(new Runnable() {
 						@Override
 						public void run() {
-							label.setValue(String.format(
-									"<h1>Running for %s seconds</h1>",
-									Integer.toString(counter)));
+							label.setValue(String.format("<h1>Running for %s seconds</h1>", Integer.toString(counter)));
 						}
 					});
 				}
 			}
 		}).start();
-
 	}
-
 }
