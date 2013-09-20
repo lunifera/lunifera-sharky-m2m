@@ -5,6 +5,8 @@ import java.net.URISyntaxException;
 import org.eclipse.paho.client.mqttv3.MqttClient;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.lunifera.sharky.m2m.commander.api.ISharkyController;
+import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
 
 public class Controller implements ISharkyController {
 
@@ -23,6 +25,11 @@ public class Controller implements ISharkyController {
 		} catch (MqttException e) {
 			e.printStackTrace();
 		}
+	}
+
+	@Activate
+	protected void activate(ComponentContext context) {
+		System.out.println("Sharky Controller started");
 	}
 
 	@Override

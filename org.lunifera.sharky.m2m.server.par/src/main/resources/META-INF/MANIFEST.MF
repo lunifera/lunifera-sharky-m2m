@@ -1,0 +1,5 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Application-Name: M2M Server Sharky 
+Application-Version: 1.0.0.qualifier
+Application-SymbolicName: org.lunifera.sharky.m2m

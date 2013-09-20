@@ -4,7 +4,8 @@ Bundle-Name: Sharky Commander
 Bundle-ManifestVersion: 2
 Bundle-SymbolicName: org.lunifera.sharky.m2m.commander
 Import-Bundle-Comment: context depends on beans, aop and so on
-Import-Package: org.osgi.service.component.annotations;version="[1.2.0,1.2.0]"
+Import-Package: org.osgi.service.component;version="[1.2.0,1.2.0]",
+ org.osgi.service.component.annotations;version="[1.2.0,1.2.0]"
 Bundle-ClassPath: .,
  tmpLib/mqtt-client-0.4.1-SNAPSHOT.jar,
  tmpLib/mqtt-utility-0.4.1-SNAPSHOT.jar

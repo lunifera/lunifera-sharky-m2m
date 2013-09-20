@@ -78,6 +78,8 @@ public class Activator implements BundleActivator, ServiceTrackerCustomizer<Http
 
 	public void start(BundleContext bundleContext) throws Exception {
 		Activator.context = bundleContext;
+		
+		System.out.println("Sharky Dashboard UI started");
 
 		resourceProvider = new ResourceProvider();
 
