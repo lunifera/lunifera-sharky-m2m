@@ -5,12 +5,11 @@
 
 
 -- load libraries
-local gpio = require("gpio")
+local sched = require("sched")
 local socket = require("socket")
 local MQTT = require("mqtt_library")
 
 -- hardware addresses
-REQUEST_PIN = 48
 UP_PIN = 68
 DOWN_PIN = 44
 RIGHT_PIN = 26
@@ -27,7 +26,7 @@ MQTT_VALUE_SEPARATOR = ":"
 -- constants for possible movements
 MAX_PITCH = 5
 MAX_SPEED = 5
-MAX_TURN = 5
+MAX_ROTATION = 5
 FIN_MOVEMENT = 500
 FIN_PAUSE = 250
 UPDOWN_MOVEMENT = 500
@@ -35,6 +34,8 @@ ROTATION_AMOUNT = FIN_MOVEMENT * 0.2
 
 -- global variables for time scheduling
 now = socket.gettime()*1000
+reqint = 1000 -- interval for position checks
+reqtim = now + reqint -- next check due
 udpos = 0 -- position of weight
 udtarget = 0 -- target of weight
 uddur = UPDOWN_MOVEMENT -- duration of weight movement
@@ -55,9 +56,6 @@ running = true -- status of application
 
 local function main()
   -- setup GPIOs
-  print("Enabling Request-GPIO: "..REQEST_PIN )
-  cmd = "sudo /opt/mihini/gpioconf "..REQUEST_PIN
-  os.execute(cmd)
   print("Enabling Up-GPIO: "..UP_PIN)
   cmd = "sudo /opt/mihini/gpioconf "..UP_PIN
   os.execute(cmd)
@@ -73,25 +71,28 @@ local function main()
 
   -- setup UART for serial communication with Arduino
   os.execute("sudo /opt/mihini/uarton")
-  rserial = io.open("/dev/ttyO4","r")
+
 
   -- setup and connect MQTT client
-  MQTT.Utility.set_debug(true)
+  --MQTT.Utility.set_debug(true)
   mqtt_client = MQTT.client.create(MQTT_SERVER_URL, MQTT_SERVER_PORT, callback)
   mqtt_client:connect(MQTT_CLIENT_ID)
   mqtt_client:subscribe({ MQTT_RECEIVE_TOPIC })
 
-  while running do
+  -- a tiny scheduler to keep track of up/down and left/right movements at the same time
+  while running == true do
+
+    -- check for incoming commands
     mqtt_client:handler()
 
+    -- perform actions that are due
     now = socket.gettime()*1000
-    if now > udtim then ud_handle() end
-    if now > fwtim then fw_handle() end
+    if now > reqtim then request_handler() end
+    if now > udtim then ud_handler() end
+    if now > fwtim then fw_handler() end
   end
 
   print("Shutting down.")
-  cmd = "sudo /opt/mihini/gpiorm "..REQUEST_PIN
-  os.execute(cmd)
   cmd = "sudo /opt/mihini/gpiorm "..UP_PIN
   os.execute(cmd)
   cmd = "sudo /opt/mihini/gpiorm "..DOWN_PIN
@@ -110,41 +111,45 @@ message)  -- string
 
   print("Received: " .. topic .. ", message: '" .. message .. "'")
 
-  command, value = string.match(message,"(%a+)%s*:%s*(-?%d+)",init)
+  command, value = string.match(message,"(%a+)%s*"..MQTT_VALUE_SEPARATOR.."%s*(-?%d+)",init)
 
   print("command: ", command)
   print("value: ", value)
 
   if (command == "request") then reqest_handler() end
+  if (command == "stop") then emergency_stop() end
+  if (command == "quit") then running = false end
+
+  value = tonumber(value) -- convert value to integer for commands that take quantifiers
+
   if (command == "pitch") then ud_changer(value) end
   if (command == "speed") then speed_changer(value) end
   if (command == "rotation") then rotation_changer(value) end
-  if (command == "stop") then emergency_stop() end
-  if (command == "quit") then runnig = false end
+
 end
 
 
 
-function fwhandle()
+function fw_handler()
   if fwstat == 1 then
     if fwdir == "l" then
-      print("left")
-      cmd = "/opt/mihini/gpiolow "..RIGHT_PIN
+      print("left "..ltdur)
+      cmd = "sudo /opt/mihini/gpiolow "..RIGHT_PIN
       os.execute(cmd)
-      cmd = "/opt/mihini/gpiohigh "..LEFT_PIN
+      cmd = "sudo /opt/mihini/gpiohigh "..LEFT_PIN
       os.execute(cmd)
       fwdir = "r"
       fwtim = now + ltdur
     elseif fwdir == "r" then
-      print("right")
-      cmd = "/opt/mihini/gpiolow "..LEFT_PIN
+      print("right "..rtdur)
+      cmd = "sudo /opt/mihini/gpiolow "..LEFT_PIN
       os.execute(cmd)
-      cmd = "/opt/mihini/gpiohigh "..RIGHT_PIN
+      cmd = "sudo /opt/mihini/gpiohigh "..RIGHT_PIN
       os.execute(cmd)
       fwdir = "n"
       fwtim = now + rtdur
     elseif fwdir == "n" then
-      print("neutral")
+      print("neutral "..fwpause)
       fwdir = "l"
       fwtim = now + fwpause
     end
@@ -156,13 +161,13 @@ end
 
 
 
-function ud_handle()
+function ud_handler()
   if udpos == udtarget then
     print("not changing pitch")
     uddir = "n"
-    cmd = "/opt/mihini/gpiolow "..DOWN_PIN
+    cmd = "sudo /opt/mihini/gpiolow "..DOWN_PIN
     os.execute(cmd)
-    cmd = "/opt/mihini/gpiolow "..UP_PIN
+    cmd = "sudo /opt/mihini/gpiolow "..UP_PIN
     os.execute(cmd)
     udtim = now + uddur
   elseif udtarget > udpos then
@@ -172,17 +177,17 @@ function ud_handle()
   end
   if uddir == "u" then
     print("up")
-    cmd = "/opt/mihini/gpiolow "..DOWN_PIN
+    cmd = "sudo /opt/mihini/gpiolow "..DOWN_PIN
     os.execute(cmd)
-    cmd = "/opt/mihini/gpiohigh "..UP_PIN
+    cmd = "sudo /opt/mihini/gpiohigh "..UP_PIN
     os.execute(cmd)
     udpos = udpos + 1
     udtim = now + uddur
   elseif uddir == "d" then
     print("down")
-    cmd = "/opt/mihini/gpiolow "..UP_PIN
+    cmd = "sudo /opt/mihini/gpiolow "..UP_PIN
     os.execute(cmd)
-    cmd = "/opt/mihini/gpiohigh "..DOWN_PIN
+    cmd = "sudo /opt/mihini/gpiohigh "..DOWN_PIN
     os.execute(cmd)
     udpos = udpos - 1
     udtim = now + uddur
@@ -192,19 +197,23 @@ end
 
 
 function request_handler()
-  cmd = "/opt/mihini/gpiohigh "..REQUEST_PIN
-  os.execute(cmd)
-  socket.sleep(0.1)
-  cmd = "/opt/mihini/gpiohigh "..REQUEST_PIN
-  os.execute(cmd)
+  wserial = io.open("/dev/ttyO4", "w")
+  wserial:write("p")
+  wserial:flush()
+  rserial = io.open("/dev/ttyO4","r")
+  line = ""
   repeat
     line = rserial:read()
     rserial:flush()
   until line ~= ""
 
+  print(line)
   -- TODO: Work out SHARK ALARM distance
 
+  mqtt_client:publish(MQTT_PUBLISH_TOPIC, line)
   mqtt_client:publish(MQTT_PUBLISH_TOPIC, "*** SHARK ALARM ***")
+
+  reqtim = now + reqint
 end
 
 
@@ -264,14 +273,16 @@ function rotation_changer(value)
     print("No rotation change")
   end
   if value == 0 then
-    ltdur, rtdur = FIN_MOVEMENT
+    leftcoeff, rightcoeff = 1
   elseif value < 0 then
-    leftcoeff = 1 + 0.2 * value
+    leftcoeff = 1 - 0.2 * value
     rightcoeff = 1
   elseif value > 0 then
     leftcoeff = 1
     rightcoeff = 1 + 0.2 * value
   end
+  ltdur = FIN_MOVEMENT * speedcoeff * leftcoeff
+  rtdur = FIN_MOVEMENT * speedcoeff * rightcoeff
 end
 
 
