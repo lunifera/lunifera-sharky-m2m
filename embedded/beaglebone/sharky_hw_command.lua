@@ -11,9 +11,9 @@ local MQTT = require("mqtt_library")
 
 -- hardware addresses
 UP_PIN = 68
-DOWN_PIN = 44
-RIGHT_PIN = 26
-LEFT_PIN = 46
+DOWN_PIN = 67
+RIGHT_PIN = 44
+LEFT_PIN = 26
 
 -- MQTT settings
 MQTT_SERVER_URL = "192.168.178.28"
@@ -21,6 +21,7 @@ MQTT_SERVER_PORT = "1883"
 MQTT_CLIENT_ID = "111"
 MQTT_PUBLISH_TOPIC = "sharky_sensors"
 MQTT_RECEIVE_TOPIC = "sharky_commands"
+MQTT_DISTANCE_TOPIC = "sharky_alarmfence"
 MQTT_VALUE_SEPARATOR = ":"
 
 -- constants for possible movements
@@ -29,7 +30,7 @@ MAX_SPEED = 5
 MAX_ROTATION = 5
 FIN_MOVEMENT = 500
 FIN_PAUSE = 250
-UPDOWN_MOVEMENT = 500
+UPDOWN_MOVEMENT = 300
 ROTATION_AMOUNT = FIN_MOVEMENT * 0.2
 
 -- global variables for time scheduling
@@ -51,6 +52,7 @@ rotation = 0 -- current direction change
 leftcoeff = 1 -- coefficient for left turn
 rightcoeff = 1 -- coefficient for right turn
 running = true -- status of application
+alarmfence = -1 -- distance for SHARK ALARM; -1 to deactivate
 
 
 
@@ -78,6 +80,7 @@ local function main()
   mqtt_client = MQTT.client.create(MQTT_SERVER_URL, MQTT_SERVER_PORT, callback)
   mqtt_client:connect(MQTT_CLIENT_ID)
   mqtt_client:subscribe({ MQTT_RECEIVE_TOPIC })
+  mqtt_client:subscribe({ MQTT_DISTANCE_TOPIC })
 
   -- a tiny scheduler to keep track of up/down and left/right movements at the same time
   while running == true do
@@ -125,6 +128,7 @@ message)  -- string
   if (command == "pitch") then ud_changer(value) end
   if (command == "speed") then speed_changer(value) end
   if (command == "rotation") then rotation_changer(value) end
+  if (command == "distance") then alarmfence_changer(value) end
 
 end
 
@@ -142,13 +146,17 @@ function fw_handler()
       fwtim = now + ltdur
     elseif fwdir == "r" then
       print("right "..rtdur)
-      cmd = "sudo /opt/mihini/gpiolow "..LEFT_PIN
-      os.execute(cmd)
       cmd = "sudo /opt/mihini/gpiohigh "..RIGHT_PIN
+      os.execute(cmd)
+      cmd = "sudo /opt/mihini/gpiolow "..LEFT_PIN
       os.execute(cmd)
       fwdir = "n"
       fwtim = now + rtdur
     elseif fwdir == "n" then
+      cmd = "sudo /opt/mihini/gpiolow "..LEFT_PIN
+      os.execute(cmd)
+      cmd = "sudo /opt/mihini/gpiolow "..RIGHT_PIN
+      os.execute(cmd)
       print("neutral "..fwpause)
       fwdir = "l"
       fwtim = now + fwpause
@@ -190,13 +198,15 @@ function ud_handler()
     cmd = "sudo /opt/mihini/gpiohigh "..DOWN_PIN
     os.execute(cmd)
     udpos = udpos - 1
-    udtim = now + uddur
+    udtim = now + uddur * 1.2 -- motor runs slower in back direction
   end
 end
 
 
 
 function request_handler()
+  if alarmfence == -1 then return end  -- do nothing if SHARK ALARM is deactivated
+  
   wserial = io.open("/dev/ttyO4", "w")
   wserial:write("p")
   wserial:flush()
@@ -208,10 +218,15 @@ function request_handler()
   until line ~= ""
 
   print(line)
-  -- TODO: Work out SHARK ALARM distance
 
-  mqtt_client:publish(MQTT_PUBLISH_TOPIC, line)
-  mqtt_client:publish(MQTT_PUBLISH_TOPIC, "*** SHARK ALARM ***")
+  a, b, c = string.match(line,"(%d+):(%d+):(%d+)")
+  a, b, c = tonumber(a), tonumber(b), tonumber(c)
+  
+  if (a < alarmfence) or (b < alarmfence) or (c < alarmfence) then
+    print("SHARK ALARM!")
+    mqtt_client:publish(MQTT_PUBLISH_TOPIC, line)
+    mqtt_client:publish(MQTT_PUBLISH_TOPIC, "*** SHARK ALARM ***")
+  end
 
   reqtim = now + reqint
 end
@@ -235,23 +250,27 @@ function speed_changer(value)
   end
   if value == 0 then
     fwstat = 0
+    cmd = "sudo /opt/mihini/gpiolow "..RIGHT_PIN
+    os.execute(cmd)
+    cmd = "sudo /opt/mihini/gpiolow "..LEFT_PIN
+    os.execute(cmd)
     ltdur, rtdur = FIN_MOVEMENT
     fwpause = FIN_PAUSE
   elseif value == 1 then
     fwstat = 1
-    speedcoeff = 0.2
+    speedcoeff = 0.6
     fwpause = FIN_PAUSE * 3
   elseif value == 2 then
     fwstat = 1
-    speedcoeff = 0.4
+    speedcoeff = 0.7
     fwpause = FIN_PAUSE * 2
   elseif value == 3 then
     fwstat = 1
-    speedcoeff = 0.5
+    speedcoeff = 0.8
     fwpause = FIN_PAUSE * 1.5
   elseif value == 4 then
     fwstat = 1
-    speedcoeff = 0.8
+    speedcoeff = 0.9
     fwpause = FIN_PAUSE
   elseif value == 5 then
     fwstat = 1
@@ -287,9 +306,27 @@ end
 
 
 
+function alarmfence_changer(value)
+  alarmfence = value
+  print("changed alarmfence")
+end
+
+
+
+
 function emergency_stop()
   speed_changer(0)
   ud_changer(0)
+  rotation_changer(0)
+  cmd = "sudo /opt/mihini/gpiolow "..DOWN_PIN
+  os.execute(cmd)
+  cmd = "sudo /opt/mihini/gpiolow "..UP_PIN
+  os.execute(cmd)
+  cmd = "sudo /opt/mihini/gpiolow "..RIGHT_PIN
+  os.execute(cmd)
+  cmd = "sudo /opt/mihini/gpiolow "..LEFT_PIN
+  os.execute(cmd)
+
 end
 
 
