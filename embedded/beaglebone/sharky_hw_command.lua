@@ -14,6 +14,7 @@ UP_PIN = 68
 DOWN_PIN = 67
 RIGHT_PIN = 44
 LEFT_PIN = 26
+ALARM_PIN = 66
 
 -- MQTT settings
 MQTT_SERVER_URL = "192.168.178.28"
@@ -49,6 +50,8 @@ fwdir = "l" -- direction of next fin movement ((l)eft, (r)ight, (n)one)
 fwstat = 0 -- status of movement
 fwtim = now + fwpause -- time for next fin movement change
 rotation = 0 -- current direction change
+glidingturn = false -- track different steering commands in gliding mode
+resettim = now + ROTATION_AMOUNT -- time for resetting fin in gliding mode
 leftcoeff = 1 -- coefficient for left turn
 rightcoeff = 1 -- coefficient for right turn
 running = true -- status of application
@@ -69,6 +72,9 @@ local function main()
   os.execute(cmd)
   print("Enabling Left-GPIO: "..LEFT_PIN)
   cmd = "sudo /opt/mihini/gpioconf "..LEFT_PIN
+  os.execute(cmd)
+  print("Enabling Alarm-GPIO: "..ALARM_PIN)
+  cmd = "sudo /opt/mihini/gpioconf "..ALARM_PIN
   os.execute(cmd)
 
   -- setup UART for serial communication with Arduino
@@ -93,6 +99,9 @@ local function main()
     if now > reqtim then request_handler() end
     if now > udtim then ud_handler() end
     if now > fwtim then fw_handler() end
+    if glidingturn == true then
+      if now > resettim then reset_glideturn() end
+    end
   end
 
   print("Shutting down.")
@@ -103,6 +112,8 @@ local function main()
   cmd = "sudo /opt/mihini/gpiorm "..RIGHT_PIN
   os.execute(cmd)
   cmd = "sudo /opt/mihini/gpiorm "..LEFT_PIN
+  os.execute(cmd)
+  cmd = "sudo /opt/mihini/gpiorm "..ALARM_PIN
   os.execute(cmd)
 end
 
@@ -119,15 +130,22 @@ message)  -- string
   print("command: ", command)
   print("value: ", value)
 
-  if (command == "request") then reqest_handler() end
-  if (command == "stop") then emergency_stop() end
-  if (command == "quit") then running = false end
+  if command == "request" then reqest_handler() end
+  if command == "stop" then emergency_stop() end
+  if command == "quit" then running = false end
 
   value = tonumber(value) -- convert value to integer for commands that take quantifiers
 
-  if (command == "pitch") then ud_changer(value) end
-  if (command == "speed") then speed_changer(value) end
-  if (command == "rotation") then rotation_changer(value) end
+  if command == "pitch" then ud_changer(value) end
+  if command == "speed" then speed_changer(value) end
+  if command == "rotation" then
+    if fwstat == 0 then
+      glidingturn = true
+      glide_rotate(value)
+    else
+      rotation_changer(value)
+    end
+  end
   if (command == "distance") then alarmfence_changer(value) end
 
 end
@@ -161,6 +179,7 @@ function fw_handler()
       fwdir = "l"
       fwtim = now + fwpause
     end
+    glidingturn = false
   elseif fwstat == 0 then
     fwtim = now + fwpause
   else print("Illegal forward status")
@@ -206,7 +225,7 @@ end
 
 function request_handler()
   if alarmfence == -1 then return end  -- do nothing if SHARK ALARM is deactivated
-  
+
   wserial = io.open("/dev/ttyO4", "w")
   wserial:write("p")
   wserial:flush()
@@ -221,11 +240,15 @@ function request_handler()
 
   a, b, c = string.match(line,"(%d+):(%d+):(%d+)")
   a, b, c = tonumber(a), tonumber(b), tonumber(c)
-  
+
   if (a < alarmfence) or (b < alarmfence) or (c < alarmfence) then
-    print("SHARK ALARM!")
-    mqtt_client:publish(MQTT_PUBLISH_TOPIC, line)
-    mqtt_client:publish(MQTT_PUBLISH_TOPIC, "*** SHARK ALARM ***")
+    print("SHARK ALARM! "..line)
+    cmd = "sudo /opt/mihini/gpiohigh "..ALARM_PIN
+    os.execute(cmd)
+    mqtt_client:publish(MQTT_PUBLISH_TOPIC, "*** SHARK ALARM ***")   
+  else
+    cmd = "sudo /opt/mihini/gpiolow "..ALARM_PIN
+    os.execute(cmd)
   end
 
   reqtim = now + reqint
@@ -284,21 +307,19 @@ end
 
 
 function rotation_changer(value)
-  if value < -MAX_ROTATION or value > MAX_ROTATION then
-    print("Illegal rotation command")
-    return
-  end
-  if value == rotation then return
-    print("No rotation change")
-  end
-  if value == 0 then
-    leftcoeff, rightcoeff = 1
-  elseif value < 0 then
-    leftcoeff = 1 - 0.2 * value
-    rightcoeff = 1
-  elseif value > 0 then
+  rotation = rotation + value
+  if rotation < -5 then rotation = -5 end
+  if rotation > 5 then rotation = 5 end
+  print("Rotation: "..rotation)
+  if rotation == 0 then
     leftcoeff = 1
-    rightcoeff = 1 + 0.2 * value
+    rightcoeff = 1
+  elseif rotation < 0 then
+    leftcoeff = 1 - 0.2 * rotation
+    rightcoeff = 1
+  elseif rotation > 0 then
+    leftcoeff = 1
+    rightcoeff = 1 + 0.2 * rotation
   end
   ltdur = FIN_MOVEMENT * speedcoeff * leftcoeff
   rtdur = FIN_MOVEMENT * speedcoeff * rightcoeff
@@ -311,6 +332,34 @@ function alarmfence_changer(value)
   print("changed alarmfence")
 end
 
+
+
+function glide_rotate(value)
+  print ("GLIDEROTATE")
+  if value == 1 then
+    cmd = "sudo /opt/mihini/gpiohigh "..RIGHT_PIN
+    os.execute(cmd)
+    cmd = "sudo /opt/mihini/gpiolow "..LEFT_PIN
+    os.execute(cmd)
+  elseif value == -1 then
+    cmd = "sudo /opt/mihini/gpiolow "..RIGHT_PIN
+    os.execute(cmd)
+    cmd = "sudo /opt/mihini/gpiohigh "..LEFT_PIN
+    os.execute(cmd)
+  end
+  resettim = now + 3 * ROTATION_AMOUNT
+end
+
+
+
+function reset_glideturn()
+  cmd = "sudo /opt/mihini/gpiolow "..RIGHT_PIN
+  os.execute(cmd)
+  cmd = "sudo /opt/mihini/gpiolow "..LEFT_PIN
+  os.execute(cmd)
+  print("RESETGLIDETURN")
+  glidingturn = false
+end
 
 
 
@@ -326,7 +375,6 @@ function emergency_stop()
   os.execute(cmd)
   cmd = "sudo /opt/mihini/gpiolow "..LEFT_PIN
   os.execute(cmd)
-
 end
 
 
