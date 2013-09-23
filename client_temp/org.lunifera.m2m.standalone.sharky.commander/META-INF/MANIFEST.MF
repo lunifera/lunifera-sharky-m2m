@@ -1,0 +1,16 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Commander
+Bundle-SymbolicName: org.lunifera.m2m.standalone.sharky.commander
+Bundle-Version: 1.0.0.qualifier
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
+Bundle-ActivationPolicy: lazy
+Import-Package: org.osgi.framework;version="1.7.0",
+ org.osgi.service.component;version="1.2.0",
+ org.osgi.util.tracker;version="1.5.1"
+Bundle-ClassPath: tmpLib/mqtt-client-0.4.1-SNAPSHOT.jar,
+ tmpLib/mqtt-utility-0.4.1-SNAPSHOT.jar,
+ .
+Service-Component: OSGI-INF/*.xml
+Export-Package: org.lunifera.m2m.standalone.sharky.commander.api
+Require-Bundle: org.junit;bundle-version="4.11.0"
