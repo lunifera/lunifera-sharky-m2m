@@ -1,0 +1,17 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Webclient
+Bundle-SymbolicName: org.lunifera.m2m.standalone.sharky.webclient
+Bundle-Version: 1.0.0.qualifier
+Bundle-Activator: org.lunifera.m2m.standalone.sharky.webclient.Activator
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
+Bundle-ActivationPolicy: lazy
+Import-Package: javax.servlet;version="2.6.0",
+ javax.servlet.http;version="2.6.0",
+ org.json;version="0.0.20080701",
+ org.lunifera.m2m.standalone.sharky.commander.api,
+ org.osgi.framework;version="1.7.0",
+ org.osgi.service.http;version="1.2.1",
+ org.osgi.util.tracker;version="1.5.1"
+Require-Bundle: com.vaadin.server;bundle-version="7.1.6",
+ com.vaadin.shared;bundle-version="7.1.6"
