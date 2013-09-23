@@ -29,9 +29,9 @@ MQTT_VALUE_SEPARATOR = ":"
 MAX_PITCH = 5
 MAX_SPEED = 5
 MAX_ROTATION = 5
-FIN_MOVEMENT = 500
+FIN_MOVEMENT = 700
 FIN_PAUSE = 250
-UPDOWN_MOVEMENT = 300
+UPDOWN_MOVEMENT = 420
 ROTATION_AMOUNT = FIN_MOVEMENT * 0.2
 
 -- global variables for time scheduling
@@ -217,7 +217,7 @@ function ud_handler()
     cmd = "sudo /opt/mihini/gpiohigh "..DOWN_PIN
     os.execute(cmd)
     udpos = udpos - 1
-    udtim = now + uddur * 1.2 -- motor runs slower in back direction
+    udtim = now + uddur * 1 -- motor runs slower in back direction
   end
 end
 
@@ -241,7 +241,7 @@ function request_handler()
   a, b, c = string.match(line,"(%d+):(%d+):(%d+)")
   a, b, c = tonumber(a), tonumber(b), tonumber(c)
 
-  if (a < alarmfence) or (b < alarmfence) or (c < alarmfence) then
+  if (a > 0 and a < alarmfence) or (b > 0 and b < alarmfence) or (c > 0 and c < alarmfence) then
     print("SHARK ALARM! "..line)
     cmd = "sudo /opt/mihini/gpiohigh "..ALARM_PIN
     os.execute(cmd)
@@ -278,27 +278,29 @@ function speed_changer(value)
     cmd = "sudo /opt/mihini/gpiolow "..LEFT_PIN
     os.execute(cmd)
     ltdur, rtdur = FIN_MOVEMENT
+    rightcoeff = 1
+    leftcoeff = 1
     fwpause = FIN_PAUSE
   elseif value == 1 then
     fwstat = 1
-    speedcoeff = 0.6
-    fwpause = FIN_PAUSE * 3
+    speedcoeff = 0.5
+    fwpause = FIN_PAUSE * 1.5
   elseif value == 2 then
     fwstat = 1
-    speedcoeff = 0.7
-    fwpause = FIN_PAUSE * 2
+    speedcoeff = 0.6
+    fwpause = FIN_PAUSE * 1
   elseif value == 3 then
     fwstat = 1
-    speedcoeff = 0.8
-    fwpause = FIN_PAUSE * 1.5
+    speedcoeff = 0.7
+    fwpause = FIN_PAUSE * 0.6
   elseif value == 4 then
     fwstat = 1
-    speedcoeff = 0.9
-    fwpause = FIN_PAUSE
+    speedcoeff = 0.8
+    fwpause = FIN_PAUSE * 0.2
   elseif value == 5 then
     fwstat = 1
-    speedcoeff = 1
-    fwpause = FIN_PAUSE * 0.5
+    speedcoeff = 0.8
+    fwpause = FIN_PAUSE * 0.0
   end
   ltdur = FIN_MOVEMENT * speedcoeff * leftcoeff
   rtdur = FIN_MOVEMENT * speedcoeff * rightcoeff
@@ -366,7 +368,7 @@ end
 function emergency_stop()
   speed_changer(0)
   ud_changer(0)
-  rotation_changer(0)
+  rotation = 0
   cmd = "sudo /opt/mihini/gpiolow "..DOWN_PIN
   os.execute(cmd)
   cmd = "sudo /opt/mihini/gpiolow "..UP_PIN
