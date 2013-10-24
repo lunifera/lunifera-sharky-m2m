@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.jnect.core.bodyprovider">
+      <body
+            class="org.jnect.emfstore.RecordingBodyProvider">
+      </body>
+   </extension>
+   <extension
+         point="org.eclipse.ui.commands">
+      <command
+            defaultHandler="org.jnect.emfstore.replay.handler.StartReplayHandler"
+            id="org.jnect.emfstore.replay.start"
+            name="Start Replay">
+      </command>
+      <command
+            defaultHandler="org.jnect.emfstore.replay.handler.StartStopRecordingHandler"
+            id="org.jnect.emfstore.replay.record"
+            name="Start/Stop Rec">
+      </command>
+      <command
+            defaultHandler="org.jnect.emfstore.replay.handler.CommitRecordedBodiesHandler"
+            id="org.jnect.emfstore.replay.commit"
+            name="Commit">
+      </command>
+   </extension>
+   <extension
+         point="org.eclipse.ui.menus">
+      <menuContribution
+            locationURI="toolbar:org.eclipse.ui.main.toolbar?after=org.jnect.demo.gef">
+         <toolbar
+               id="org.jnect.emfstore.replay">
+            <command
+                  commandId="org.jnect.emfstore.replay.record"
+                  style="push">
+            </command>
+            <command
+                  commandId="org.jnect.emfstore.replay.commit"
+                  style="push">
+            </command>
+            <command
+                  commandId="org.jnect.emfstore.replay.start"
+                  style="push">
+            </command>
+         </toolbar>
+      </menuContribution>
+   </extension>
+
+</plugin>

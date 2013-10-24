@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<launchConfiguration type="org.eclipse.jdt.launching.localJavaApplication">
+<listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_PATHS">
+<listEntry value="/org.lunifera.m2m.nite.sample/src/org/lunifera/m2m/nite/sample/UserTrackerApplication.java"/>
+</listAttribute>
+<listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_TYPES">
+<listEntry value="1"/>
+</listAttribute>
+<booleanAttribute key="org.eclipse.jdt.launching.ATTR_USE_START_ON_FIRST_THREAD" value="true"/>
+<stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="org.lunifera.m2m.nite.sample.UserTrackerApplication"/>
+<stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="org.lunifera.m2m.nite.sample"/>
+<stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-Djava.library.path=/home/luni/Desktop/Cam/OpenNI-Bin-Dev-Linux-x86-v1.5.2.23/Lib"/>
+</launchConfiguration>

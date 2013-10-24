@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.jnect</groupId>
+    <artifactId>jnect-parent</artifactId>
+    <version>0.2.1</version>
+  </parent>
+  <groupId>org.jnect</groupId>
+  <artifactId>org.jnect.updatesite.aggregator</artifactId>
+  <version>0.2.1</version>
+  <packaging>pom</packaging>
+  <modules>
+    <module>../org.eclipse.gef.examples.shapes</module>
+    <module>../org.jnect.api.feature</module>
+    <module>../org.jnect.bodymodel</module>
+    <module>../org.jnect.core</module>
+    <module>../org.jnect.demo.debug</module>
+    <module>../org.jnect.demo.feature</module>
+    <module>../org.jnect.demo.game</module>
+    <module>../org.jnect.demo.gef</module>
+    <module>../org.jnect.demo.gef.editing.feature</module>
+    <module>../org.jnect.demo.speechctrl</module>
+    <module>../org.jnect.demo.speechctrl.feature</module>
+    <module>../org.jnect.emfstore</module>
+    <module>../org.jnect.emfstore.feature</module>
+    <module>../org.jnect.gesture</module>
+    <module>../org.jnect.ui</module>
+    <module>.</module>
+  </modules>
+</project>

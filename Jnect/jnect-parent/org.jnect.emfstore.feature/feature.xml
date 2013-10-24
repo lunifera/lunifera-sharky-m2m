@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feature
+      id="org.jnect.emfstore.feature"
+      label="Jnect Emfstore Demo Feature"
+      version="0.2.2.qualifier"
+      provider-name="jnect.org">
+
+   <description url="http://www.example.com/description">
+      This feature contains a plugin using the IBodyProvider-Extension Point to record bodymodel-changes to EMFStore and replay them.
+   </description>
+
+   <copyright url="http://www.example.com/copyright">
+      [Enter Copyright Description here.]
+   </copyright>
+
+   <license url="http://www.example.com/license">
+      [Enter License Description here.]
+   </license>
+
+   <requires>
+      <import plugin="org.eclipse.ui"/>
+      <import plugin="org.eclipse.core.runtime"/>
+      <import plugin="org.eclipse.emf.common"/>
+      <import plugin="org.eclipse.emf.emfstore.client"/>
+      <import plugin="org.jnect.bodymodel"/>
+      <import plugin="org.jnect.core" />
+      <import plugin="org.jnect.demo.gef" />
+   </requires>
+
+   <plugin
+         id="org.jnect.emfstore"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.jnect.ui"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+</feature>

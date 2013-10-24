@@ -1,0 +1,12 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Jnect Presentation
+Bundle-SymbolicName: org.jnect.demo.presentation;singleton:=true
+Bundle-Version: 0.2.0
+Bundle-Activator: org.jnect.demo.presentation.Activator
+Bundle-Vendor: jnect.org
+Require-Bundle: org.eclipse.ui,
+ org.eclipse.core.runtime,
+ org.jnect.core;bundle-version="[0.1.0,1.0.0)"
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-ActivationPolicy: lazy

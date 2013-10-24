@@ -1,0 +1,12 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Sample
+Bundle-SymbolicName: org.lunifera.m2m.nite.sample
+Bundle-Version: 1.0.0.qualifier
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-ClassPath: lib/com.primesense.NITE.jar,
+ lib/org.OpenNI.jar,
+ libPaho/mqtt-client-0.4.0-sources.jar,
+ libPaho/mqtt-client-0.4.0.jar,
+ libPaho/mqtt-utility.jar,
+ .

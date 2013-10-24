@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.eclipse.ui.menus">
+      <menuContribution
+            locationURI="toolbar:org.eclipse.ui.main.toolbar?after=additions">
+         <toolbar
+               id="org.jnect.demo.presentation">
+            <command
+                  commandId="org.jnect.demo.presentation.start"
+                  label="Start Demo"
+                  style="push">
+            </command>
+         </toolbar>
+      </menuContribution>
+   </extension>
+   <extension
+         point="org.eclipse.ui.commands">
+      <command
+            defaultHandler="org.jnect.demo.presentation.handler.StartDemoHandler"
+            id="org.jnect.demo.presentation.start"
+            name="Start Demo">
+      </command>
+   </extension>
+
+</plugin>

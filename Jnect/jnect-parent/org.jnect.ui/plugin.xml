@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.eclipse.ui.commands">
+      <command
+            id="org.jnect.base.startKinect"
+            name="Start Kinect">
+      </command>
+      <command
+            id="org.jnect.base.stopKinect"
+            name="Stop Kinect">
+      </command>
+   </extension>
+   <extension
+         point="org.eclipse.ui.handlers">
+      <handler
+            class="org.jnect.ui.handler.StartKinectHandler"
+            commandId="org.jnect.base.startKinect">
+      </handler>
+      <handler
+            class="org.jnect.ui.handler.StopKinectHandler"
+            commandId="org.jnect.base.stopKinect">
+      </handler>
+   </extension>
+   <extension
+         point="org.eclipse.ui.menus">
+      <menuContribution
+            locationURI="toolbar:org.eclipse.ui.main.toolbar?after=additions">
+         <toolbar
+               id="org.jnect.base">
+            <command
+                  commandId="org.jnect.base.startKinect"
+                  label="Start Kinect"
+                  style="push">
+            </command>
+            <command
+                  commandId="org.jnect.base.stopKinect"
+                  label="Stop Kinect"
+                  style="push">
+            </command>
+         </toolbar>
+      </menuContribution>
+   </extension>
+
+</plugin>

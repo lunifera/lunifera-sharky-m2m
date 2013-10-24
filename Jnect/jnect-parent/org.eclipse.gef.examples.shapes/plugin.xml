@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.0"?>
+<plugin>
+
+     <extension point="org.eclipse.ui.editors">
+      <editor name="GEF Shapes Example"
+              extensions="shapes"
+              icon="shapes.gif"
+              default="true"
+              class="org.eclipse.gef.examples.shapes.ShapesEditor"
+              contributorClass="org.eclipse.gef.examples.shapes.ShapesEditorActionBarContributor"
+              id="GEF Shapes Editor">
+      </editor>
+   </extension>
+   <extension point="org.eclipse.ui.newWizards">
+      <category name="Examples"
+                parentCategory="org.eclipse.ui.Examples"
+                id="org.eclipse.gef.examples"/>
+      <wizard name="Shapes Diagram"
+              icon="shapes.gif"
+              category="org.eclipse.ui.Examples/org.eclipse.gef.examples"
+              class="org.eclipse.gef.examples.shapes.ShapesCreationWizard"
+              id="org.eclipse.gef.examples.shapes.ShapesCreationWizard">
+         <selection class="org.eclipse.core.resources.IResource"/>
+      </wizard>
+   </extension>
+   <extension
+         point="org.eclipse.ui.commands">
+      <command
+            defaultHandler="org.eclipse.gef.examples.shapes.handler.StartGefEditingHandler"
+            id="org.eclipse.gef.examples.shapes.start"
+            name="Start Shapes Editing">
+      </command>
+      <command
+            defaultHandler="org.eclipse.gef.examples.shapes.handler.StopGefEditingHandler"
+            id="org.eclipse.gef.examples.shapes.stop"
+            name="Stop Shapes Editing">
+      </command>
+   </extension>
+   <extension
+         point="org.eclipse.ui.menus">
+      <menuContribution
+            locationURI="toolbar:org.eclipse.ui.main.toolbar?after=additions">
+         <toolbar
+               id="org.eclipse.gef.examples.shapes">
+            <command
+                  commandId="org.eclipse.gef.examples.shapes.start"
+                  label="Start Shapes Editing"
+                  style="push">
+            </command>
+            <command
+                  commandId="org.eclipse.gef.examples.shapes.stop"
+                  label="Stop Shapes Editing"
+                  style="push">
+            </command>
+         </toolbar>
+      </menuContribution>
+   </extension>
+</plugin>

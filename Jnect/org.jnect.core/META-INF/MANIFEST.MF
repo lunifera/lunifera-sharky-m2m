@@ -1,0 +1,26 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Jnect core
+Bundle-SymbolicName: org.jnect.core;singleton:=true
+Bundle-Version: 0.2.2.qualifier
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Require-Bundle: org.jnect.bodymodel;bundle-version="0.1.0";visibility:=reexport,
+ org.eclipse.core.runtime;bundle-version="3.7.0"
+Export-Package: org.eclipse.paho.client.mqttv3,
+ org.eclipse.paho.client.mqttv3.internal,
+ org.eclipse.paho.client.mqttv3.internal.security,
+ org.eclipse.paho.client.mqttv3.internal.wire,
+ org.eclipse.paho.client.mqttv3.logging,
+ org.eclipse.paho.client.mqttv3.persist,
+ org.eclipse.paho.client.mqttv3.util,
+ org.jnect.core;uses:="org.jnect.bodymodel",
+ org.jnect.core.impl.connection.m2m,
+ org.jnect.core.m2m
+Bundle-ClassPath: lib/jni4net.j-0.8.6.0.jar,
+ lib/MicrosoftKinectWrapper.j4n.jar,
+ .,
+ libPaho/mqtt-client-0.4.0.jar,
+ libPaho/mqtt-utility.jar,
+ libPaho/mqtt-client-0.4.0-sources.jar
+Bundle-ActivationPolicy: lazy
+Bundle-Vendor: jnect.org

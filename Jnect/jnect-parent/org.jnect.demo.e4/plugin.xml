@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<plugin>
+
+   <extension
+         id="product"
+         point="org.eclipse.core.runtime.products">
+      <product
+            name="org.jnect.demo.e4"
+            application="org.eclipse.e4.ui.workbench.swt.E4Application">
+         <property
+               name="appName"
+               value="org.jnect.demo.e4">
+         </property>
+         <property
+               name="applicationXMI"
+               value="org.jnect.demo.e4/Application.e4xmi">
+         </property>
+         <property
+               name="applicationCSS"
+               value="platform:/plugin/org.jnect.demo.e4/css/default.css">
+         </property>
+      </product>
+   </extension>
+
+</plugin>

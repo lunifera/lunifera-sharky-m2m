@@ -1,0 +1,16 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Jnect Emfstore
+Bundle-SymbolicName: org.jnect.emfstore;singleton:=true
+Bundle-Version: 0.2.2.qualifier
+Bundle-Activator: org.jnect.emfstore.Activator
+Require-Bundle: org.eclipse.ui,
+ org.eclipse.core.runtime,
+ org.eclipse.emf.common,
+ org.eclipse.emf.emfstore.client,
+ org.jnect.bodymodel,
+ org.jnect.core;bundle-version="0.1.3",
+ org.jnect.demo.gef;bundle-version="0.1.3"
+Bundle-ActivationPolicy: lazy
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Export-Package: org.jnect.emfstore

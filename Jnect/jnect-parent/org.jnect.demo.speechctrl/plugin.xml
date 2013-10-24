@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.eclipse.ui.commands">
+      <command
+            id="org.jnect.demo.speechctrl.start"
+            name="Start Speech Control">
+      </command>
+      <command
+            id="org.jnect.demo.speechctrl.stop"
+            name="Stop Speech Control">
+      </command>
+   </extension>
+   <extension
+         point="org.eclipse.ui.handlers">
+      <handler
+            class="org.jnect.demo.speechctrl.handler.StartSpeechControlHandler"
+            commandId="org.jnect.demo.speechctrl.start">
+      </handler>
+      <handler
+            class="org.jnect.demo.speechctrl.handler.StopSpeechControlHandler"
+            commandId="org.jnect.demo.speechctrl.stop">
+      </handler>
+   </extension>
+   <extension
+         point="org.eclipse.ui.menus">
+      <menuContribution
+            allPopups="false"
+            locationURI="toolbar:org.eclipse.ui.main.toolbar?after=additions">
+         <toolbar
+               id="org.jnect.demo.speechctrl.speech">
+            <command
+                  commandId="org.jnect.demo.speechctrl.start"
+                  label="Start Speech Control"
+                  style="push">
+            </command>
+            <command
+                  commandId="org.jnect.demo.speechctrl.stop"
+                  label="Stop Speech Control"
+                  style="push">
+            </command>
+         </toolbar>
+      </menuContribution>
+   </extension>
+
+</plugin>
